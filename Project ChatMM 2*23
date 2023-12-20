@@ -1,0 +1,143 @@
+#include <iostream>
+#include <string>
+#include <vector>
+using namespace std;
+class User {
+public:
+User(string login, string password, string name) :
+login(login), password(password), name(name) {}
+string getLogin() const {
+return login;
+}
+string getPassword() const {
+return password;
+}
+string getName() const {
+return name;
+}
+private:
+string login;
+string password;
+string name;
+};
+class Chat {
+public:
+void registerUser() {
+string login, password, name;
+cout << "Введите логин: ";
+cin >> login;
+if (isUserExist(login)) {
+cout << "Пользователь с таким логином уже существует!" << endl;
+return;
+}
+cout << "Введите пароль: ";
+cin >> password;
+cout << "Введите имя: ";
+cin >> name;
+User newUser(login, password, name);
+users.push_back(newUser);
+cout << "Пользователь успешно зарегистрирован!" << endl;
+}
+void loginUser() {
+string login, password;
+cout << "Введите логин: ";
+cin >> login;
+if (!isUserExist(login)) {
+cout << "Пользователь с таким логином не существует!" << endl;
+return;
+}
+cout << "Введите пароль: ";
+cin >> password;
+User* foundUser = findUser(login);
+if (foundUser && foundUser->getPassword() == password) {
+loggedInUser = foundUser;
+cout << "Вы успешно вошли в чат!" << endl;
+} else {
+cout << "Неправильный пароль!" << endl;
+}
+}
+void sendMessageToUser() {
+if (!loggedInUser) {
+cout << "Сначала необходимо войти в чат!" << endl;
+return;
+}
+string recipient;
+cout << "Введите логин получателя: ";
+cin >> recipient;
+User* recipientUser = findUser(recipient);
+if (!recipientUser) {
+cout << "Пользователь с таким логином не найден!" << endl;
+return;
+}
+string message;
+cout << "Введите сообщение: ";
+getline(cin >> ws, message);
+cout << "Сообщение отправлено пользователю " << recipientUser->getName() << ": "
+<< message << endl;
+}
+void broadcastMessage() {
+if (!loggedInUser) {
+cout << "Сначала необходимо войти в чат!" << endl;
+return;
+}
+string message;
+cout << "Введите сообщение: ";
+getline(cin >> ws, message);
+cout << "Сообщение отправлено всем пользователям: " << message << endl;
+}
+private:
+vector<User> users;
+User* loggedInUser = nullptr;
+bool isUserExist(const string& login) {
+for (const auto& user : users) {
+if (user.getLogin() == login) {
+return true;
+}
+}
+return false;
+}
+User* findUser(const string& login) {
+for (auto& user : users) {
+if (user.getLogin() == login) {
+return &user;
+}
+}
+return nullptr;
+}
+};
+int main() {
+Chat chat;
+int choice;
+do {
+cout << "Выберите действие:" << endl;
+cout << "1. Регистрация пользователя" << endl;
+cout << "2. Вход в чат" << endl;
+cout << "3. Отправить сообщение конкретному пользователю" << endl;
+cout << "4. Обмен сообщениями между всеми пользователями" << endl;
+cout << "0. Выход" << endl;
+cout << "Выберите действие: ";
+cin >> choice;
+switch (choice) {
+case 1:
+chat.registerUser();
+break;
+case 2:
+chat.loginUser();
+break;
+case 3:
+chat.sendMessageToUser();
+break;
+case 4:
+chat.broadcastMessage();
+break;
+case 0:
+cout << "До свидания!" << endl;
+break;
+default:
+cout << "Неверный выбор. Попробуйте снова." << endl;
+break;
+}
+cout << endl;
+} while (choice != 0);
+return 0;
+}
